@@ -1,12 +1,14 @@
 import { contentProps } from "@/data/placeholders";
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  Pressable
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Pressable,
+  TouchableHighlight
 } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useState } from "react";
 
 type ItemProps = {
   title: string
@@ -18,31 +20,42 @@ type ItemProps = {
   disableRearrange: boolean
 };
 
-const SetItem = ({ weight, reps }: contentProps) => {
+const SetItem = ({ item }: { item: contentProps }) => {
+  const [isComplete, setComplete] = useState<boolean>(false);
+
   return (
-    <View style={styles.setContainer}>
-      <Text>{weight} lbs</Text>
-      <Text>{reps} reps</Text>
-    </View>
+    <TouchableHighlight
+      onPress={() => setComplete(!isComplete)}
+      underlayColor="#fff"
+    >
+      <View style={[styles.setContainer, isComplete && styles.isComplete]}>
+        <View style={{ flex: 1 }}>
+          <Text>{item.weight} lbs</Text>
+          <Text>{item.reps} reps</Text>
+        </View>
+        {isComplete && <MaterialIcons name="check-circle-outline" size={24} color="green" />}
+      </View>
+    </TouchableHighlight>
   );
 };
 
-export default function Item({ 
-  title, 
-  minRep, 
-  maxRep, 
-  sets, 
-  content, 
-  rearrange, 
-  disableRearrange 
+export default function Item({
+  title,
+  minRep,
+  maxRep,
+  sets,
+  content,
+  rearrange,
+  disableRearrange
 }: ItemProps) {
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.header}>{title}</Text>
         <Pressable
-        onLongPress={rearrange}
-        disabled={disableRearrange}
+          onLongPress={rearrange}
+          disabled={disableRearrange}
         >
           <MaterialIcons name="reorder" size={24} color="black" />
         </Pressable>
@@ -51,9 +64,10 @@ export default function Item({
       <FlatList
         data={content}
         renderItem={({ item }) =>
-          <SetItem weight={item.weight} reps={item.reps} />
+          <SetItem item={item} />
         }
         horizontal={true}
+        keyExtractor={item => item.id}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 8 }}
       />
@@ -83,11 +97,18 @@ const styles = StyleSheet.create({
     marginVertical: 6
   },
   setContainer: {
-    justifyContent: 'center',
+    flex: 1,
+    gap: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 14,
     paddingVertical: 6,
     backgroundColor: '#F2F2F2',
-    borderRadius: 8
+    borderRadius: 8,
+  },
+  isComplete: {
+    backgroundColor: '#90EE90',
+    paddingHorizontal: 10,
   }
 });
