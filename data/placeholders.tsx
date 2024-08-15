@@ -11,7 +11,7 @@ export type dataProps = {
   content: contentProps[]
 }
 
-export const data = [
+export const data_placeholder = [
   {
     id: '1',
     title: 'Barbell Row (bar +)',

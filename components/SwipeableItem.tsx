@@ -3,11 +3,11 @@ import { dataProps } from '@/data/placeholders';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Item from './Item';
 import {
-  Text,
   View,
   StyleSheet,
   Pressable
 } from "react-native";
+import { RenderItemParams } from 'react-native-draggable-flatlist';
 
 const SNAP_POINTS_LEFT: number = 60;
 const SNAP_POINTS_RIGHT: number = 60;
@@ -34,7 +34,8 @@ const UnderlayRight = () => {
   );
 };
 
-export default function SwipeItem({ item }: { item: dataProps }) {
+export default function SwipeItem({props}: {props: RenderItemParams<dataProps>}) {
+  const {item, drag, isActive} = props;
 
   return (
     <SwipeableItem
@@ -50,6 +51,8 @@ export default function SwipeItem({ item }: { item: dataProps }) {
         maxRep={item.repRange[1]}
         sets={item.sets}
         content={item.content}
+        rearrange={drag}
+        disableRearrange={isActive}
       />
     </SwipeableItem>
   );

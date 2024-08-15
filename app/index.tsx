@@ -3,13 +3,28 @@ import {
   View,
   SafeAreaView,
   StyleSheet,
-  FlatList,
   Pressable
 } from "react-native";
-import { data } from '@/data/placeholders';
+import { data_placeholder, dataProps } from '@/data/placeholders';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import SwipeItem from "@/components/SwipeableItem";
+import DraggableFlatList, {
+  ScaleDecorator,
+  RenderItemParams,
+} from "react-native-draggable-flatlist";
+import { useState } from "react";
 
 export default function Index() {
+  const [data, setData] = useState<dataProps[]>(data_placeholder);
+
+  const renderItem = (params: RenderItemParams<dataProps>) => {
+    return (
+      <ScaleDecorator>
+        <SwipeItem props={params}/>
+      </ScaleDecorator>
+    );
+  };
+
   const onPress = () => {
     alert('You have finished your workout!');
   };
@@ -17,17 +32,22 @@ export default function Index() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.header}>Pull Day</Text>
-        <Text>Estimated Time: 65 minutes</Text>
+        <View style={styles.textContainer}>
+          <Text style={styles.header}>Pull Day</Text>
+          <Text>Estimated Time: 65 minutes</Text>
+        </View>
+        <View style={styles.addButton}>
+          <MaterialIcons name="add-circle" size={30} color="black" />
+        </View>
       </View>
       <View style={styles.mainContainer}>
-        <FlatList
+        <DraggableFlatList
           data={data}
-          renderItem={({ item }) => 
-            <SwipeItem item={item} />
-          }
+          renderItem={renderItem}
+          onDragEnd={({ data }) => setData(data)}
           keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
+          activationDistance={20}
         />
       </View>
       <View style={styles.footerContainer}>
@@ -44,19 +64,30 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 20,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    marginHorizontal: 30
   },
   headerContainer: {
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingTop: 20,
+  },
+  textContainer: {
+    flex: 3,
+    justifyContent: 'center',
   },
   header: {
     fontWeight: 'bold',
     fontSize: 30
   },
+  addButton: {
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
   mainContainer: {
     flex: 8,
-    marginHorizontal: 30
   },
   footerContainer: {
     flex: 1
