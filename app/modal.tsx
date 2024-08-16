@@ -12,6 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { Slider } from '@miblanchard/react-native-slider';
 import { FlatList } from 'react-native-gesture-handler';
+import ThemedButton from '@/components/ThemedButton';
 
 const MAX_NUM_SETS = 10;
 const MAX_REPS = 20;
@@ -19,14 +20,14 @@ const MAX_REPS = 20;
 const weightPlaceholder: weightProps[] =
   Array.from({ length: 10 }, (_, i) => ({
     id: String(i + 1),
-    weight: 0,
-    reps: 1,
+    weight: '0',
+    reps: '1',
   }))
 
 type weightProps = {
   id: string,
-  weight: number,
-  reps: number,
+  weight: string,
+  reps: string,
 }
 
 const Separator = ({ text }: { text: string }) => {
@@ -47,11 +48,16 @@ export default function Modal() {
   const [repRange, setRepRange] = useState<number[]>([1, 20]);
   const [numSets, setNumSets] = useState<number>(0);
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const [selectedLanguage, setSelectedLanguage] = useState();
   const [weights, setWeights] = useState<weightProps[]>(weightPlaceholder);
 
   const onPress = () => {
-    alert(`Exercise Added: ${repRange[0]} - ${repRange[1]} ${text} x ${numSets}`);
+    onChangeText('');
+    setRepRange([1, 20]);
+    setNumSets(0);
+    setIsFocused(false);
+    setWeights(weightPlaceholder);
+    alert(`Added exercise: ${text}`);
+    router.back();
   };
 
   return (
@@ -61,6 +67,7 @@ export default function Modal() {
         behavior={Platform.OS === "ios" ? "padding" : 'height'}
         style={styles.formContainer}
       >
+        {/* Exercise Name */}
         <View style={styles.inputContainer}>
           <Text style={styles.fieldName}>Exercise Name</Text>
           <TextInput
@@ -71,6 +78,7 @@ export default function Modal() {
             onFocus={() => setIsFocused(true)}
           />
         </View>
+        {/* Number of Sets */}
         <View style={styles.inputContainer}>
           <Text style={styles.fieldName}>Number of Sets</Text>
           <FlatList
@@ -85,6 +93,7 @@ export default function Modal() {
             contentContainerStyle={{ gap: 10 }}
           />
         </View>
+        {/* Range of Reps */}
         <View style={styles.inputContainer}>
           <Text style={styles.fieldName}>Range of Reps</Text>
           <View style={styles.rangeLabels}>
@@ -109,28 +118,52 @@ export default function Modal() {
             thumbTintColor="#fff"
           />
         </View>
+        {/* Separator */}
         <View style={styles.inputContainer}>
           <Separator text={"Weights"} />
         </View>
+        {/* Weights */}
         <View style={styles.inputContainer}>
           <FlatList
             data={weights.slice(0, numSets)}
-            renderItem={({ item }) =>
+            style={{ flexGrow: 0, height: 200 }}
+            renderItem={({ item, index }) =>
               <View style={styles.gridItem}>
-                <Text>Set {item.id}:</Text>
-                <Text>{item.weight}</Text>
-                <Text>{item.reps}</Text>
+                <Text style={{ fontSize: 20 }}>Set {item.id}: </Text>
+                <TextInput
+                  style={styles.weightInput}
+                  value={weights[index].weight}
+                  onChangeText={(text) => setWeights(
+                    (prev) => {
+                      const newWeight = [...prev];
+                      newWeight[index].weight = text;
+                      return newWeight;
+                    }
+                  )}
+                  keyboardType='numeric'
+                />
+                <Text style={{ fontSize: 20 }}>lbs</Text>
+                <TextInput
+                  style={[styles.weightInput, { width: 60 }]}
+                  value={weights[index].reps}
+                  onChangeText={(text) => setWeights(
+                    (prev) => {
+                      const newWeight = [...prev];
+                      newWeight[index].reps = text;
+                      return newWeight;
+                    }
+                  )}
+                  keyboardType='numeric'
+                />
+                <Text style={{ fontSize: 20 }}>reps</Text>
               </View>
             }
             keyExtractor={item => item.id}
-            showsVerticalScrollIndicator={false}
             contentContainerStyle={{ gap: 10 }}
           />
         </View>
         <View style={styles.inputContainer}>
-          <Pressable style={styles.button} onPress={onPress}>
-            <Text style={styles.buttonText}>Finish Workout</Text>
-          </Pressable>
+          <ThemedButton content={"Add Exercise"} onPress={onPress} />
         </View>
       </KeyboardAvoidingView>
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
@@ -197,17 +230,17 @@ const styles = StyleSheet.create({
   gridItem: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    gap: 20,
-  },
-  button: {
+    gap: 10,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    backgroundColor: 'black',
   },
-  buttonText: {
-    color: '#fff'
-  },
+  weightInput: {
+    height: 50,
+    backgroundColor: '#fff',
+    width: 80,
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    fontSize: 20,
+    borderColor: '#D3D3D3',
+  }
 });

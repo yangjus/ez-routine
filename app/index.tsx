@@ -16,6 +16,7 @@ import DraggableFlatList, {
 import { useState } from "react";
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import ThemedButton from "@/components/ThemedButton";
 
 export default function Index() {
   const [data, setData] = useState<dataProps[]>(data_placeholder);
@@ -44,7 +45,7 @@ export default function Index() {
           <Link href="/modal" asChild>
             <Pressable hitSlop={20} children={({ pressed }) => (
               <MaterialIcons name="add-circle" size={30} color={pressed ? "gray" : "black"} />
-            )}/>
+            )} />
           </Link>
         </View>
       </View>
@@ -59,9 +60,7 @@ export default function Index() {
         />
       </View>
       <View style={styles.footerContainer}>
-        <Pressable style={styles.button} onPress={onPress}>
-          <Text style={styles.buttonText}>Finish Workout</Text>
-        </Pressable>
+        <ThemedButton content={"Finish Workout"} onPress={onPress} />
       </View>
       <StatusBar style={Platform.OS === 'ios' ? 'dark' : 'auto'} />
     </SafeAreaView>
@@ -100,16 +99,5 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     flex: 1
-  },
-  button: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    backgroundColor: 'black',
-  },
-  buttonText: {
-    color: '#fff'
   },
 });
