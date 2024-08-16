@@ -16,7 +16,10 @@ const UnderlayLeft = () => {
   const { close } = useSwipeableItemParams();
   return (
     <View style={[styles.row, styles.underlayLeft]}>
-      <Pressable onPress={() => close()}>
+      <Pressable 
+        onPress={() => close()}
+        hitSlop={{top: 40, bottom: 40, left: 10, right: 10}}
+      >
         <MaterialIcons name="delete" size={30} color="white" />
       </Pressable>
     </View>
@@ -27,7 +30,10 @@ const UnderlayRight = () => {
   const { close } = useSwipeableItemParams();
   return (
     <View style={[styles.row, styles.underlayRight]}>
-      <Pressable onPress={() => close()}>
+      <Pressable 
+        onPress={() => close()}
+        hitSlop={{top: 40, bottom: 40, left: 10, right: 10}}
+      >
         <MaterialIcons name="edit" size={30} color="white" />
       </Pressable>
     </View>
