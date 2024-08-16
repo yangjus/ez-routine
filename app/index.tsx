@@ -3,7 +3,8 @@ import {
   View,
   SafeAreaView,
   StyleSheet,
-  Pressable
+  Pressable,
+  Platform
 } from "react-native";
 import { data_placeholder, dataProps } from '@/data/placeholders';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -13,6 +14,8 @@ import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
 import { useState } from "react";
+import { Link } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 export default function Index() {
   const [data, setData] = useState<dataProps[]>(data_placeholder);
@@ -20,12 +23,13 @@ export default function Index() {
   const renderItem = (params: RenderItemParams<dataProps>) => {
     return (
       <ScaleDecorator>
-        <SwipeItem props={params}/>
+        <SwipeItem props={params} />
       </ScaleDecorator>
     );
   };
 
   const onPress = () => {
+    // remove all green checkmarks
     alert('You have finished your workout!');
   };
 
@@ -37,7 +41,11 @@ export default function Index() {
           <Text>Estimated Time: 65 minutes</Text>
         </View>
         <View style={styles.addButton}>
-          <MaterialIcons name="add-circle" size={30} color="black" />
+          <Link href="/modal" asChild>
+            <Pressable hitSlop={20} children={({ pressed }) => (
+              <MaterialIcons name="add-circle" size={30} color={pressed ? "gray" : "black"} />
+            )}/>
+          </Link>
         </View>
       </View>
       <View style={styles.mainContainer}>
@@ -55,6 +63,7 @@ export default function Index() {
           <Text style={styles.buttonText}>Finish Workout</Text>
         </Pressable>
       </View>
+      <StatusBar style={Platform.OS === 'ios' ? 'dark' : 'auto'} />
     </SafeAreaView>
   );
 };

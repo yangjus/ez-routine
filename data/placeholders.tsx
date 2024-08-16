@@ -1,4 +1,5 @@
 export type contentProps = {
+  id: string
   weight: number
   reps: number
 }
@@ -18,10 +19,10 @@ export const data_placeholder = [
     repRange: [6, 10],
     sets: 4,
     content: [
-      { weight: 80, reps: 8 },
-      { weight: 90, reps: 8 },
-      { weight: 90, reps: 9 },
-      { weight: 90, reps: 10 },
+      { id: '1', weight: 80, reps: 8, check: false },
+      { id: '2', weight: 90, reps: 8, check: false },
+      { id: '3', weight: 90, reps: 9, check: false },
+      { id: '4', weight: 90, reps: 10, check: false },
     ],
   },
   {
@@ -30,9 +31,9 @@ export const data_placeholder = [
     repRange: [8, 12],
     sets: 3,
     content: [
-      { weight: 80, reps: 10 },
-      { weight: 80, reps: 12 },
-      { weight: 80, reps: 12 },
+      { id: '1', weight: 80, reps: 10, check: false },
+      { id: '2', weight: 80, reps: 12, check: false },
+      { id: '3', weight: 80, reps: 12, check: false },
     ],
   },
   {
@@ -41,9 +42,9 @@ export const data_placeholder = [
     repRange: [10, 15],
     sets: 3,
     content: [
-      { weight: 60, reps: 15 },
-      { weight: 70, reps: 10 },
-      { weight: 70, reps: 10 },
+      { id: '1', weight: 60, reps: 15, check: false },
+      { id: '2', weight: 70, reps: 10, check: false },
+      { id: '3', weight: 70, reps: 10, check: false },
     ],
   },
   {
@@ -52,9 +53,9 @@ export const data_placeholder = [
     repRange: [10, 15],
     sets: 3,
     content: [
-      { weight: 80, reps: 13 },
-      { weight: 80, reps: 13 },
-      { weight: 100, reps: 12 },
+      { id: '1', weight: 80, reps: 13, check: false },
+      { id: '2', weight: 80, reps: 13, check: false },
+      { id: '3', weight: 100, reps: 12, check: false },
     ],
   },
   {
@@ -63,9 +64,9 @@ export const data_placeholder = [
     repRange: [8, 12],
     sets: 4,
     content: [
-      { weight: 50, reps: 8 },
-      { weight: 50, reps: 10 },
-      { weight: 50, reps: 10 },
+      { id: '1', weight: 50, reps: 8, check: false },
+      { id: '2', weight: 50, reps: 10, check: false },
+      { id: '3', weight: 50, reps: 10, check: false },
     ],
   },
   {
@@ -74,10 +75,10 @@ export const data_placeholder = [
     repRange: [8, 12],
     sets: 4,
     content: [
-      { weight: 140, reps: 12 },
-      { weight: 160, reps: 10 },
-      { weight: 160, reps: 10 },
-      { weight: 160, reps: 10 },
+      { id: '1', weight: 140, reps: 12, check: false },
+      { id: '2', weight: 160, reps: 10, check: false },
+      { id: '3', weight: 160, reps: 10, check: false },
+      { id: '4', weight: 160, reps: 10, check: false },
     ],
   }
 

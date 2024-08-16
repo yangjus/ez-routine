@@ -44,6 +44,7 @@ export default function SwipeItem({props}: {props: RenderItemParams<dataProps>})
       renderUnderlayRight={() => <UnderlayRight />}
       snapPointsLeft={[SNAP_POINTS_LEFT]}
       snapPointsRight={[SNAP_POINTS_RIGHT]}
+      key={item.id}
     >
       <Item
         title={item.title}
