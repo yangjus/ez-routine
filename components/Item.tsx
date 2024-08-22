@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 12,
   },
   header: {
     fontWeight: 'bold',

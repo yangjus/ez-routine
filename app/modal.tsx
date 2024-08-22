@@ -7,12 +7,15 @@ import {
   KeyboardAvoidingView,
   Pressable,
 } from 'react-native';
+import uuid from 'react-native-uuid';
 import { Link, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { Slider } from '@miblanchard/react-native-slider';
 import { FlatList } from 'react-native-gesture-handler';
 import ThemedButton from '@/components/ThemedButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { contentProps, dataProps } from '@/data/placeholders';
 
 const MAX_NUM_SETS = 10;
 const MAX_REPS = 20;
@@ -50,7 +53,13 @@ export default function Modal() {
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [weights, setWeights] = useState<weightProps[]>(weightPlaceholder);
 
-  const onPress = () => {
+  const onPress = async () => {
+    if (text.trim() === '') {
+      alert("Add exercise name");
+      return;
+    }
+    console.log(numSets);
+    await addItemToStorage();
     onChangeText('');
     setRepRange([1, 20]);
     setNumSets(0);
@@ -58,6 +67,25 @@ export default function Modal() {
     setWeights(weightPlaceholder);
     alert(`Added exercise: ${text}`);
     router.back();
+  };
+
+  const addItemToStorage = async () => {
+    const id: string = uuid.v4() as string;
+    const content: contentProps[] = weights.splice(0, numSets).map((item: weightProps) => ({
+      id: item.id,
+      weight: Number(item.weight),
+      reps: Number(item.reps),
+    }));
+    const newItem = {
+      id,
+      title: text,
+      repRange,
+      sets: numSets,
+      content
+    };
+    const jsonValue = await AsyncStorage.getItem('@data');
+    const data: dataProps[] = jsonValue != null ? JSON.parse(jsonValue) : [];
+    await AsyncStorage.setItem('@data', JSON.stringify([newItem, ...data]));
   };
 
   return (

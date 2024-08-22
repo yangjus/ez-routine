@@ -13,25 +13,47 @@ import DraggableFlatList, {
   ScaleDecorator,
   RenderItemParams,
 } from "react-native-draggable-flatlist";
-import { useState } from "react";
-import { Link } from "expo-router";
+import { useState, useEffect } from "react";
+import { Link, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 export default function Index() {
-  const [data, setData] = useState<dataProps[]>(data_placeholder);
+  const [data, setData] = useState<dataProps[]>();
+  const segments = useSegments();
+  const { getItem, setItem } = useAsyncStorage('@data');
+
+  const readItemFromStorage = async () => {
+    const item = await getItem();
+    setData(item != null ? JSON.parse(item) : data_placeholder);
+  };
+
+  const deleteItemFromStorage = async (id: string) => {
+    const newItem = data?.filter(item => item.id !== id);
+    await setItem(JSON.stringify(newItem));
+    setData(newItem);
+  }
+
+  useEffect(() => {
+    readItemFromStorage();
+    console.log(data);
+  }, [segments]);
+
+  const onPress = async () => {
+    // remove all green checkmarks
+    alert('You have finished your workout!');
+  };
 
   const renderItem = (params: RenderItemParams<dataProps>) => {
     return (
       <ScaleDecorator>
-        <SwipeItem props={params} />
+        <SwipeItem 
+          props={params} 
+          onDelete={deleteItemFromStorage}
+        />
       </ScaleDecorator>
     );
-  };
-
-  const onPress = () => {
-    // remove all green checkmarks
-    alert('You have finished your workout!');
   };
 
   return (
@@ -51,7 +73,7 @@ export default function Index() {
       </View>
       <View style={styles.mainContainer}>
         <DraggableFlatList
-          data={data}
+          data={data ?? []}
           renderItem={renderItem}
           onDragEnd={({ data }) => setData(data)}
           keyExtractor={item => item.id}

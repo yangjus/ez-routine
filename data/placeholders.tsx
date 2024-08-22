@@ -67,6 +67,7 @@ export const data_placeholder = [
       { id: '1', weight: 50, reps: 8, check: false },
       { id: '2', weight: 50, reps: 10, check: false },
       { id: '3', weight: 50, reps: 10, check: false },
+      { id: '4', weight: 50, reps: 10, check: false },
     ],
   },
   {

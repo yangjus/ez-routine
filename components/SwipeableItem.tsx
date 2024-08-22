@@ -12,12 +12,11 @@ import { RenderItemParams } from 'react-native-draggable-flatlist';
 const SNAP_POINTS_LEFT: number = 60;
 const SNAP_POINTS_RIGHT: number = 60;
 
-const UnderlayLeft = () => {
-  const { close } = useSwipeableItemParams();
+const UnderlayLeft = ({onDelete, id}: {onDelete: (id: string) => Promise<void>, id: string}) => {
   return (
     <View style={[styles.row, styles.underlayLeft]}>
       <Pressable 
-        onPress={() => close()}
+        onPress={() => onDelete(id)}
         hitSlop={{top: 40, bottom: 40, left: 10, right: 10}}
       >
         <MaterialIcons name="delete" size={30} color="white" />
@@ -40,13 +39,13 @@ const UnderlayRight = () => {
   );
 };
 
-export default function SwipeItem({props}: {props: RenderItemParams<dataProps>}) {
+export default function SwipeItem({props, onDelete}: {props: RenderItemParams<dataProps>, onDelete: (id: string) => Promise<void>}) {
   const {item, drag, isActive} = props;
 
   return (
     <SwipeableItem
       item={item}
-      renderUnderlayLeft={() => <UnderlayLeft />}
+      renderUnderlayLeft={() => <UnderlayLeft onDelete={onDelete} id={item.id}/>}
       renderUnderlayRight={() => <UnderlayRight />}
       snapPointsLeft={[SNAP_POINTS_LEFT]}
       snapPointsRight={[SNAP_POINTS_RIGHT]}
