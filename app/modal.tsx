@@ -75,6 +75,7 @@ export default function Modal() {
       id: item.id,
       weight: Number(item.weight),
       reps: Number(item.reps),
+      check: false
     }));
     const newItem = {
       id,

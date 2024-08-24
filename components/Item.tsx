@@ -1,4 +1,4 @@
-import { contentProps } from "@/data/placeholders";
+import { contentProps, dataProps } from "@/data/placeholders";
 import {
   View,
   Text,
@@ -7,9 +7,11 @@ import {
   Pressable
 } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type ItemProps = {
+  id: string
   title: string
   minRep: number
   maxRep: number
@@ -19,11 +21,33 @@ type ItemProps = {
   disableRearrange: boolean
 };
 
-const SetItem = ({ item }: { item: contentProps }) => {
-  const [isComplete, setComplete] = useState<boolean>(false);
+const SetItem = ({ item, parentId }: { item: contentProps, parentId: string }) => {
+  const [isComplete, setComplete] = useState<boolean>();
+
+  useEffect(() => {
+    setComplete(item.check);
+  }, [item.check])
+
+  const setId: string = item.id;
+  
+  const saveComplete = async () => {
+    // change in storage based on parentId and item.id
+    const jsonValue = await AsyncStorage.getItem('@data');
+    const data: dataProps[] = jsonValue != null ? JSON.parse(jsonValue) : [];
+    console.log(data)
+    const setData: dataProps[] = data!.map((item: dataProps) => ({
+      ...item,
+      content: item.content.map((set: contentProps) => ({
+        ...set,
+        check: item.id === parentId && set.id === setId ? !isComplete : set.check,
+      })),
+    }));
+    await AsyncStorage.setItem('@data', JSON.stringify(setData));
+    setComplete(!isComplete);
+  };
 
   return (
-    <Pressable onPress={() => setComplete(!isComplete)}>
+    <Pressable onPress={() => saveComplete()}>
       <View style={[styles.setContainer, isComplete && styles.isComplete]}>
         <View style={{ flex: 1 }}>
           <Text>{item.weight} lbs</Text>
@@ -36,6 +60,7 @@ const SetItem = ({ item }: { item: contentProps }) => {
 };
 
 export default function Item({
+  id,
   title,
   minRep,
   maxRep,
@@ -61,7 +86,7 @@ export default function Item({
       <FlatList
         data={content}
         renderItem={({ item }) =>
-          <SetItem item={item} />
+          <SetItem item={item} parentId={id}/>
         }
         horizontal={true}
         keyExtractor={item => item.id}
@@ -74,7 +99,6 @@ export default function Item({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
@@ -87,8 +111,10 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   header: {
+    flex: 1,
     fontWeight: 'bold',
     fontSize: 20,
+    flexWrap: 'wrap',
   },
   subheader: {
     fontSize: 14,

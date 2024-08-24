@@ -42,6 +42,8 @@ const UnderlayRight = () => {
 export default function SwipeItem({props, onDelete}: {props: RenderItemParams<dataProps>, onDelete: (id: string) => Promise<void>}) {
   const {item, drag, isActive} = props;
 
+  console.log("item: ", item.content)
+
   return (
     <SwipeableItem
       item={item}
@@ -52,6 +54,7 @@ export default function SwipeItem({props, onDelete}: {props: RenderItemParams<da
       key={item.id}
     >
       <Item
+        id={item.id}
         title={item.title}
         minRep={item.repRange[0]}
         maxRep={item.repRange[1]}

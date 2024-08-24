@@ -2,6 +2,7 @@ export type contentProps = {
   id: string
   weight: number
   reps: number
+  check: boolean
 }
 
 export type dataProps = {
@@ -12,7 +13,7 @@ export type dataProps = {
   content: contentProps[]
 }
 
-export const data_placeholder = [
+export const data_placeholder: dataProps[] = [
   {
     id: '1',
     title: 'Barbell Row (bar +)',
