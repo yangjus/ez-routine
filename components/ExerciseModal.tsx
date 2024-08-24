@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Link, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Slider } from '@miblanchard/react-native-slider';
 import { FlatList } from 'react-native-gesture-handler';
 import ThemedButton from '@/components/ThemedButton';
@@ -17,7 +17,7 @@ import ThemedButton from '@/components/ThemedButton';
 const MAX_NUM_SETS = 10;
 const MAX_REPS = 20;
 
-const weightPlaceholder: weightProps[] =
+export const weightPlaceholder: weightProps[] =
   Array.from({ length: 10 }, (_, i) => ({
     id: String(i + 1),
     weight: '0',
@@ -49,33 +49,42 @@ const Separator = ({ text }: { text: string }) => {
   );
 };
 
-export default function Modal( 
-  {props, func, onPressAlertContent, onPressButtonContent} : {
+export default function Modal({
+    props, 
+    func, 
+    onPressAlertContent, 
+    onPressButtonContent, 
+    resetOnPress,
+  } : {
     props: modalProps, 
     func: ({text, repRange, numSets, weights}: modalProps) => Promise<void>,
     onPressAlertContent: string,
-    onPressButtonContent: string
+    onPressButtonContent: string,
+    resetOnPress: boolean,
   }) {
-  console.log("props for modal: ", props);
   const isPresented = router.canGoBack();
   const [text, onChangeText] = useState<string>(props.text!);
   const [repRange, setRepRange] = useState<number[]>(props.repRange!);
   const [numSets, setNumSets] = useState<number>(props.numSets!);
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const [weights, setWeights] = useState<weightProps[]>(props.weights!);
+  const [weights, setWeights] = useState<weightProps[]>([...props.weights!, ...JSON.parse(JSON.stringify(weightPlaceholder.slice(props.weights!.length)))]);
+
+  console.log("prop weights: ", props.weights);
+  console.log("weights: ", weights);
 
   const onPress = async () => {
     if (text.trim() === '') {
       alert("Add exercise name");
       return;
     }
-    console.log(numSets);
     await func({text, repRange, numSets, weights});
-    onChangeText('');
-    setRepRange([1, 20]);
-    setNumSets(0);
+    if (resetOnPress) {
+      onChangeText('');
+      setRepRange([1, 20]);
+      setNumSets(0);
+      setWeights([...JSON.parse(JSON.stringify(weightPlaceholder))]);
+    }
     setIsFocused(false);
-    setWeights(weightPlaceholder);
     alert(`${onPressAlertContent} exercise: ${text}`);
     router.back();
   };

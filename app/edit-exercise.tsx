@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { contentProps, dataProps } from '@/data/placeholders';
 import Modal, { modalProps, weightProps } from '../components/ExerciseModal';
 import { useEffect, useState } from 'react';
-import { weightPlaceholder } from './add-exercise';
+import { weightPlaceholder } from '../components/ExerciseModal';
 import { UnknownOutputParams, useLocalSearchParams } from "expo-router";
 import { Text } from 'react-native';
 
@@ -35,7 +35,7 @@ export default function EditExercise() {
             reps: String(item.reps),
           }));
           // fill in rest of empty sets
-          setWeights([...initialWeights, ...weightPlaceholder.splice(exercise.sets)]);
+          setWeights(initialWeights);
         }
       } finally {
         setIsLoading(false);
@@ -45,7 +45,7 @@ export default function EditExercise() {
   }, []);
 
   const editItemFromStorage = async ({ text, repRange, numSets, weights }: modalProps) => {
-    const content: contentProps[] = weights!.splice(0, numSets).map((item: weightProps) => ({
+    const content: contentProps[] = weights!.slice(0, numSets).map((item: weightProps) => ({
       // change id only if need a new uuid (placeholder before)
       id: item.id.length > 2 ? item.id : uuid.v4() as string,
       weight: Number(item.weight),
@@ -81,6 +81,7 @@ export default function EditExercise() {
       func={editItemFromStorage} 
       onPressAlertContent='Edited'
       onPressButtonContent='Edit'
+      resetOnPress={false}
     />
   );
 };
