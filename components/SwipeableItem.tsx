@@ -8,16 +8,17 @@ import {
   Pressable
 } from "react-native";
 import { RenderItemParams } from 'react-native-draggable-flatlist';
+import { Link } from 'expo-router';
 
 const SNAP_POINTS_LEFT: number = 60;
 const SNAP_POINTS_RIGHT: number = 60;
 
-const UnderlayLeft = ({onDelete, id}: {onDelete: (id: string) => Promise<void>, id: string}) => {
+const UnderlayLeft = ({ onDelete, id }: { onDelete: (id: string) => Promise<void>, id: string }) => {
   return (
     <View style={[styles.row, styles.underlayLeft]}>
-      <Pressable 
+      <Pressable
         onPress={() => onDelete(id)}
-        hitSlop={{top: 40, bottom: 40, left: 10, right: 10}}
+        hitSlop={{ top: 40, bottom: 40, left: 10, right: 10 }}
       >
         <MaterialIcons name="delete" size={30} color="white" />
       </Pressable>
@@ -25,28 +26,36 @@ const UnderlayLeft = ({onDelete, id}: {onDelete: (id: string) => Promise<void>, 
   );
 };
 
-const UnderlayRight = () => {
+const UnderlayRight = ({ id }: { id: string }) => {
   const { close } = useSwipeableItemParams();
   return (
     <View style={[styles.row, styles.underlayRight]}>
-      <Pressable 
-        onPress={() => close()}
-        hitSlop={{top: 40, bottom: 40, left: 10, right: 10}}
+      <Link
+        href={{
+          pathname: "/edit-exercise",
+          params: { exerciseId: id },
+        }}
+        asChild
       >
-        <MaterialIcons name="edit" size={30} color="white" />
-      </Pressable>
+        <Pressable
+          onPress={() => close()}
+          hitSlop={{ top: 40, bottom: 40, left: 10, right: 10 }}
+        >
+          <MaterialIcons name="edit" size={30} color="white" />
+        </Pressable>
+      </Link>
     </View>
   );
 };
 
-export default function SwipeItem({props, onDelete}: {props: RenderItemParams<dataProps>, onDelete: (id: string) => Promise<void>}) {
-  const {item, drag, isActive} = props;
+export default function SwipeItem({ props, onDelete }: { props: RenderItemParams<dataProps>, onDelete: (id: string) => Promise<void> }) {
+  const { item, drag, isActive } = props;
 
   return (
     <SwipeableItem
       item={item}
-      renderUnderlayLeft={() => <UnderlayLeft onDelete={onDelete} id={item.id}/>}
-      renderUnderlayRight={() => <UnderlayRight />}
+      renderUnderlayLeft={() => <UnderlayLeft onDelete={onDelete} id={item.id} />}
+      renderUnderlayRight={() => <UnderlayRight id={item.id} />}
       snapPointsLeft={[SNAP_POINTS_LEFT]}
       snapPointsRight={[SNAP_POINTS_RIGHT]}
       key={item.id}

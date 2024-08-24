@@ -31,10 +31,10 @@ export type weightProps = {
 }
 
 export type modalProps = {
-  text: string,
-  repRange: number[],
-  numSets: number,
-  weights: weightProps[],
+  text?: string,
+  repRange?: number[],
+  numSets?: number,
+  weights?: weightProps[],
 }
 
 const Separator = ({ text }: { text: string }) => {
@@ -50,16 +50,19 @@ const Separator = ({ text }: { text: string }) => {
 };
 
 export default function Modal( 
-  {props, func} : {
+  {props, func, onPressAlertContent, onPressButtonContent} : {
     props: modalProps, 
-    func: ({text, repRange, numSets, weights}: modalProps) => Promise<void>
+    func: ({text, repRange, numSets, weights}: modalProps) => Promise<void>,
+    onPressAlertContent: string,
+    onPressButtonContent: string
   }) {
+  console.log("props for modal: ", props);
   const isPresented = router.canGoBack();
-  const [text, onChangeText] = useState<string>(props.text);
-  const [repRange, setRepRange] = useState<number[]>(props.repRange);
-  const [numSets, setNumSets] = useState<number>(props.numSets);
+  const [text, onChangeText] = useState<string>(props.text!);
+  const [repRange, setRepRange] = useState<number[]>(props.repRange!);
+  const [numSets, setNumSets] = useState<number>(props.numSets!);
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const [weights, setWeights] = useState<weightProps[]>(props.weights);
+  const [weights, setWeights] = useState<weightProps[]>(props.weights!);
 
   const onPress = async () => {
     if (text.trim() === '') {
@@ -73,7 +76,7 @@ export default function Modal(
     setNumSets(0);
     setIsFocused(false);
     setWeights(weightPlaceholder);
-    alert(`Added exercise: ${text}`);
+    alert(`${onPressAlertContent} exercise: ${text}`);
     router.back();
   };
 
@@ -146,7 +149,7 @@ export default function Modal(
             style={{ flexGrow: 0, height: 200 }}
             renderItem={({ item, index }) =>
               <View style={styles.gridItem}>
-                <Text style={{ fontSize: 20 }}>Set {item.id}: </Text>
+                <Text style={{ fontSize: 20 }}>Set {index + 1}: </Text>
                 <TextInput
                   style={styles.weightInput}
                   value={weights[index].weight}
@@ -180,7 +183,7 @@ export default function Modal(
           />
         </View>
         <View style={styles.inputContainer}>
-          <ThemedButton content={"Add Exercise"} onPress={onPress} />
+          <ThemedButton content={`${onPressButtonContent} Exercise`} onPress={onPress} />
         </View>
       </KeyboardAvoidingView>
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />

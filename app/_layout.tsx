@@ -7,6 +7,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="index" options={{ title: 'Monday Routine' }} />
         <Stack.Screen name="add-exercise" options={{ title: 'Add Exercise', presentation: 'modal' }} />
+        <Stack.Screen name="edit-exercise" options={{ title: 'Edit Exercise', presentation: 'modal' }} />
       </Stack>
     </GestureHandlerRootView>
   );

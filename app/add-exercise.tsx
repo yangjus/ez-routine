@@ -1,16 +1,16 @@
 import uuid from 'react-native-uuid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { contentProps, dataProps } from '@/data/placeholders';
-import Modal, { modalProps, weightProps } from '../components/modal';
+import Modal, { modalProps, weightProps } from '../components/ExerciseModal';
 
-const weightPlaceholder: weightProps[] =
+export const weightPlaceholder: weightProps[] =
   Array.from({ length: 10 }, (_, i) => ({
     id: String(i + 1),
     weight: '0',
     reps: '1',
   }));
 
-const initialInput: modalProps = {
+export const initialInput: modalProps = {
     text: '',
     repRange: [1, 20],
     numSets: 0,
@@ -21,7 +21,7 @@ export default function AddExercise() {
 
   const addItemToStorage = async ({text, repRange, numSets, weights}: modalProps) => {
     const id: string = uuid.v4() as string;
-    const content: contentProps[] = weights.splice(0, numSets).map((item: weightProps) => ({
+    const content: contentProps[] = weights!.splice(0, numSets).map((item: weightProps) => ({
       id: uuid.v4() as string,
       weight: Number(item.weight),
       reps: Number(item.reps)
@@ -39,6 +39,11 @@ export default function AddExercise() {
   };
 
   return (
-    <Modal props={initialInput} func={addItemToStorage}/>
+    <Modal 
+      props={initialInput} 
+      func={addItemToStorage}
+      onPressAlertContent='Added'
+      onPressButtonContent='Add'
+    />
   );
 };
