@@ -72,10 +72,9 @@ export default function Modal() {
   const addItemToStorage = async () => {
     const id: string = uuid.v4() as string;
     const content: contentProps[] = weights.splice(0, numSets).map((item: weightProps) => ({
-      id: item.id,
+      id: uuid.v4() as string,
       weight: Number(item.weight),
-      reps: Number(item.reps),
-      check: false
+      reps: Number(item.reps)
     }));
     const newItem = {
       id,

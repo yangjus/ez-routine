@@ -6,7 +6,7 @@ import {
   Pressable,
   Platform
 } from "react-native";
-import { data_placeholder, dataProps, contentProps } from '@/data/placeholders';
+import { data_placeholder, dataProps } from '@/data/placeholders';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import SwipeItem from "@/components/SwipeableItem";
 import DraggableFlatList, {
@@ -35,19 +35,6 @@ export default function Index() {
     setData(newItem);
   };
 
-  const resetCheckmarks = async () => {
-    const resetData: dataProps[] = data!.map((item: dataProps) => ({
-      ...item,
-      content: item.content.map((set: contentProps) => ({
-        ...set,
-        check: false,
-      })),
-    }));
-    console.log("data reset:", resetData);
-    await setItem(JSON.stringify(resetData));
-    setData(resetData);
-  };
-
   useEffect(() => {
     console.log("data changed: ", data)
   }, [data])
@@ -59,12 +46,10 @@ export default function Index() {
 
   const onPress = async () => {
     // remove all green checkmarks
-    await resetCheckmarks();
     alert('You have finished your workout!');
   };
 
   const renderItem = (params: RenderItemParams<dataProps>) => {
-    console.log("params: ", params)
     return (
       <ScaleDecorator>
         <SwipeItem 
@@ -94,7 +79,7 @@ export default function Index() {
         <DraggableFlatList
           data={data ?? []}
           renderItem={renderItem}
-          onDragEnd={({ data }) => setData([...data])}
+          onDragEnd={({ data }) => setData(data)}
           keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
           activationDistance={20}
