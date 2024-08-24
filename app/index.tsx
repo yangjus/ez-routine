@@ -68,7 +68,7 @@ export default function Index() {
           <Text>Estimated Time: 65 minutes</Text>
         </View>
         <View style={styles.addButton}>
-          <Link href="/modal" asChild>
+          <Link href="/add-exercise" asChild>
             <Pressable hitSlop={20} children={({ pressed }) => (
               <MaterialIcons name="add-circle" size={30} color={pressed ? "gray" : "black"} />
             )} />

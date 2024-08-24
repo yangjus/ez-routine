@@ -7,15 +7,12 @@ import {
   KeyboardAvoidingView,
   Pressable,
 } from 'react-native';
-import uuid from 'react-native-uuid';
 import { Link, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { Slider } from '@miblanchard/react-native-slider';
 import { FlatList } from 'react-native-gesture-handler';
 import ThemedButton from '@/components/ThemedButton';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { contentProps, dataProps } from '@/data/placeholders';
 
 const MAX_NUM_SETS = 10;
 const MAX_REPS = 20;
@@ -27,10 +24,17 @@ const weightPlaceholder: weightProps[] =
     reps: '1',
   }))
 
-type weightProps = {
+export type weightProps = {
   id: string,
   weight: string,
   reps: string,
+}
+
+export type modalProps = {
+  text: string,
+  repRange: number[],
+  numSets: number,
+  weights: weightProps[],
 }
 
 const Separator = ({ text }: { text: string }) => {
@@ -45,13 +49,17 @@ const Separator = ({ text }: { text: string }) => {
   );
 };
 
-export default function Modal() {
+export default function Modal( 
+  {props, func} : {
+    props: modalProps, 
+    func: ({text, repRange, numSets, weights}: modalProps) => Promise<void>
+  }) {
   const isPresented = router.canGoBack();
-  const [text, onChangeText] = useState<string>('');
-  const [repRange, setRepRange] = useState<number[]>([1, 20]);
-  const [numSets, setNumSets] = useState<number>(0);
+  const [text, onChangeText] = useState<string>(props.text);
+  const [repRange, setRepRange] = useState<number[]>(props.repRange);
+  const [numSets, setNumSets] = useState<number>(props.numSets);
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const [weights, setWeights] = useState<weightProps[]>(weightPlaceholder);
+  const [weights, setWeights] = useState<weightProps[]>(props.weights);
 
   const onPress = async () => {
     if (text.trim() === '') {
@@ -59,7 +67,7 @@ export default function Modal() {
       return;
     }
     console.log(numSets);
-    await addItemToStorage();
+    await func({text, repRange, numSets, weights});
     onChangeText('');
     setRepRange([1, 20]);
     setNumSets(0);
@@ -67,25 +75,6 @@ export default function Modal() {
     setWeights(weightPlaceholder);
     alert(`Added exercise: ${text}`);
     router.back();
-  };
-
-  const addItemToStorage = async () => {
-    const id: string = uuid.v4() as string;
-    const content: contentProps[] = weights.splice(0, numSets).map((item: weightProps) => ({
-      id: uuid.v4() as string,
-      weight: Number(item.weight),
-      reps: Number(item.reps)
-    }));
-    const newItem = {
-      id,
-      title: text,
-      repRange,
-      sets: numSets,
-      content
-    };
-    const jsonValue = await AsyncStorage.getItem('@data');
-    const data: dataProps[] = jsonValue != null ? JSON.parse(jsonValue) : [];
-    await AsyncStorage.setItem('@data', JSON.stringify([newItem, ...data]));
   };
 
   return (
