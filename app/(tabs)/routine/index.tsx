@@ -14,14 +14,16 @@ import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
 import { useState, useEffect } from "react";
-import { Link, UnknownOutputParams, useLocalSearchParams, useSegments } from "expo-router";
+import { Link, UnknownOutputParams, useLocalSearchParams, useNavigation, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 export default function Routine() {
+  const navigation = useNavigation();
   const props: UnknownOutputParams = useLocalSearchParams();
-  const { routineId } = props; // used to identify id
+  // TODO: hold routines within id
+  const { dayOfWeek, routineId } = props; // used to identify id
   const [data, setData] = useState<dataProps[]>();
   const segments = useSegments();
   const { getItem, setItem } = useAsyncStorage('@data');
@@ -37,19 +39,24 @@ export default function Routine() {
     setData(newItem);
   };
 
-  useEffect(() => {
-    console.log("data changed: ", data)
-  }, [data])
-
-  useEffect(() => {
-    readItemFromStorage();
-    console.log("open new tab");
-  }, [segments]);
-
   const onPress = async () => {
     // remove all green checkmarks
     alert('You have finished your workout!');
   };
+
+  useEffect(() => {
+    console.log("day of week: ", dayOfWeek);
+    console.log("data rendered/changed");
+  }, [data])
+
+  useEffect(() => {
+    navigation.setOptions({ 
+      title: `${dayOfWeek} Routine`, 
+      headerShown: true,
+    });
+    readItemFromStorage();
+    console.log("open new tab");
+  }, [segments]);
 
   const renderItem = (params: RenderItemParams<dataProps>) => {
     return (
