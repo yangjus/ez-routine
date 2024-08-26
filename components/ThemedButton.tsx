@@ -3,12 +3,23 @@ import { GestureResponderEvent, Pressable, StyleSheet, Text } from "react-native
 type ThemedButtonProps = {
   content: string
   onPress: (event: GestureResponderEvent) => void
+  type?: string
 }
 
-export default function ThemedButton({ content, onPress }: ThemedButtonProps) {
+export default function ThemedButton({ content, onPress, type = "default" }: ThemedButtonProps) {
+  const buttonStyle = [
+    styles.button,
+    type === "warning" && styles.warningButton,
+  ];
+
+  const buttonTextStyle = [
+    styles.buttonText,
+    type === "warning" && styles.warningButtonText,
+  ];
+
   return (
-    <Pressable style={styles.button} onPress={onPress}>
-      <Text style={styles.buttonText}>{content}</Text>
+    <Pressable style={buttonStyle} onPress={onPress}>
+      <Text style={buttonTextStyle}>{content}</Text>
     </Pressable>
   );
 };
@@ -24,5 +35,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff'
+  },
+  warningButton: {
+    backgroundColor: "#DC143C",
+  },
+  warningButtonText: {
+    color: "white",
   },
 });
