@@ -1,9 +1,9 @@
 import uuid from 'react-native-uuid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { contentProps, dataProps } from '@/data/placeholders';
-import Modal, { modalProps, weightProps } from '../components/ExerciseModal';
+import Modal, { modalProps, weightProps } from '../../../components/ExerciseModal';
 import { useEffect, useState } from 'react';
-import { weightPlaceholder } from '../components/ExerciseModal';
+import { weightPlaceholder } from '../../../components/ExerciseModal';
 import { UnknownOutputParams, useLocalSearchParams } from "expo-router";
 import { Text } from 'react-native';
 

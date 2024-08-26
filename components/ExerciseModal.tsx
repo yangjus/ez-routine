@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Link, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Slider } from '@miblanchard/react-native-slider';
 import { FlatList } from 'react-native-gesture-handler';
 import ThemedButton from '@/components/ThemedButton';
@@ -18,7 +18,7 @@ const MAX_NUM_SETS = 10;
 const MAX_REPS = 20;
 
 export const weightPlaceholder: weightProps[] =
-  Array.from({ length: 10 }, (_, i) => ({
+  Array.from({ length: MAX_NUM_SETS }, (_, i) => ({
     id: String(i + 1),
     weight: '0',
     reps: '1',
@@ -67,10 +67,10 @@ export default function Modal({
   const [repRange, setRepRange] = useState<number[]>(props.repRange!);
   const [numSets, setNumSets] = useState<number>(props.numSets!);
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const [weights, setWeights] = useState<weightProps[]>([...props.weights!, ...JSON.parse(JSON.stringify(weightPlaceholder.slice(props.weights!.length)))]);
-
-  console.log("prop weights: ", props.weights);
-  console.log("weights: ", weights);
+  const [weights, setWeights] = useState<weightProps[]>([
+    ...props.weights!, 
+    ...JSON.parse(JSON.stringify(weightPlaceholder.slice(props.weights!.length)))
+  ]);
 
   const onPress = async () => {
     if (text.trim() === '') {

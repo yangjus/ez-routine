@@ -32,7 +32,7 @@ const UnderlayRight = ({ id }: { id: string }) => {
     <View style={[styles.row, styles.underlayRight]}>
       <Link
         href={{
-          pathname: "/edit-exercise",
+          pathname: "/(tabs)/routine/edit-exercise",
           params: { exerciseId: id },
         }}
         asChild

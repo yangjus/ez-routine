@@ -14,12 +14,14 @@ import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
 import { useState, useEffect } from "react";
-import { Link, useSegments } from "expo-router";
+import { Link, UnknownOutputParams, useLocalSearchParams, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
-export default function Index() {
+export default function Routine() {
+  const props: UnknownOutputParams = useLocalSearchParams();
+  const { routineId } = props; // used to identify id
   const [data, setData] = useState<dataProps[]>();
   const segments = useSegments();
   const { getItem, setItem } = useAsyncStorage('@data');
@@ -68,7 +70,7 @@ export default function Index() {
           <Text>Estimated Time: 65 minutes</Text>
         </View>
         <View style={styles.addButton}>
-          <Link href="/add-exercise" asChild>
+          <Link href="/routine/add-exercise" asChild>
             <Pressable hitSlop={20} children={({ pressed }) => (
               <MaterialIcons name="add-circle" size={30} color={pressed ? "gray" : "black"} />
             )} />
