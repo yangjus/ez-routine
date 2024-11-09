@@ -7,8 +7,8 @@ import {
   Pressable,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { Link } from "expo-router";
 import { FlatList } from "react-native-gesture-handler";
+import { Link } from "expo-router";
 
 const daysOfWeek = [
   "Monday",
@@ -20,7 +20,7 @@ const daysOfWeek = [
   "Sunday",
 ];
 
-export default function Index() {
+export default function Workouts() {
   const renderItem = ({ item }: { item: string }) => {
     return (
       <Link
@@ -40,8 +40,7 @@ export default function Index() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.header}>EZ Routine</Text>
-        <Text>"Results happen over time, not overnight"</Text>
+        <Text style={styles.header}>Workouts</Text>
       </View>
       <View style={styles.mainContainer}>
         <FlatList
@@ -65,12 +64,11 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     alignItems: "center",
-    gap: 10,
     marginVertical: 20,
   },
   header: {
     fontWeight: "bold",
-    fontSize: 36,
+    fontSize: 30,
   },
   mainContainer: {
     flex: 1,

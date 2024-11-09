@@ -27,11 +27,9 @@ export default function Settings() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.headerContainer}>
-        <View style={styles.textContainer}>
-          <Text style={styles.header}>Settings</Text>
-        </View>
-      </Text>
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Settings</Text>
+      </View>
       <View style={styles.mainContainer}>
         <ThemedButton
           content="Clear All Data"
@@ -47,27 +45,21 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 20,
+    gap: 10,
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 30,
   },
   headerContainer: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingTop: 20,
-  },
-  textContainer: {
-    flex: 3,
-    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 20,
   },
   header: {
     fontWeight: "bold",
     fontSize: 30,
   },
   mainContainer: {
-    flex: 8,
+    flex: 1,
     width: "100%",
   },
 });

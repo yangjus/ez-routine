@@ -1,10 +1,7 @@
 import uuid from "react-native-uuid";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { contentProps, dataProps } from "@/data/placeholders";
-import Modal, {
-  modalProps,
-  weightProps,
-} from "../../components/ExerciseModal";
+import Modal, { modalProps, weightProps } from "../../components/ExerciseModal";
 
 export const initialInput: modalProps = {
   text: "",
