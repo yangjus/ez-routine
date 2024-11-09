@@ -4,9 +4,9 @@ import { contentProps, dataProps } from "@/data/placeholders";
 import Modal, {
   modalProps,
   weightProps,
-} from "../../../components/ExerciseModal";
+} from "../../components/ExerciseModal";
 import { useEffect, useState } from "react";
-import { weightPlaceholder } from "../../../components/ExerciseModal";
+import { weightPlaceholder } from "../../components/ExerciseModal";
 import { UnknownOutputParams, useLocalSearchParams } from "expo-router";
 import { Text } from "react-native";
 

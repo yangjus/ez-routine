@@ -4,7 +4,7 @@ import { contentProps, dataProps } from "@/data/placeholders";
 import Modal, {
   modalProps,
   weightProps,
-} from "../../../components/ExerciseModal";
+} from "../../components/ExerciseModal";
 
 export const initialInput: modalProps = {
   text: "",

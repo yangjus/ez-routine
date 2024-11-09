@@ -25,7 +25,7 @@ export default function Index() {
     return (
       <Link
         href={{
-          pathname: "/(tabs)/routine",
+          pathname: "/routine",
           params: { dayOfWeek: item },
         }}
         asChild

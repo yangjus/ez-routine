@@ -1,19 +1,23 @@
-import SwipeableItem, { useSwipeableItemParams } from 'react-native-swipeable-item';
-import { dataProps } from '@/data/placeholders';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import Item from './Item';
-import {
-  View,
-  StyleSheet,
-  Pressable
-} from "react-native";
-import { RenderItemParams } from 'react-native-draggable-flatlist';
-import { Link } from 'expo-router';
+import SwipeableItem, {
+  useSwipeableItemParams,
+} from "react-native-swipeable-item";
+import { dataProps } from "@/data/placeholders";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Item from "./Item";
+import { View, StyleSheet, Pressable } from "react-native";
+import { RenderItemParams } from "react-native-draggable-flatlist";
+import { Link } from "expo-router";
 
 const SNAP_POINTS_LEFT: number = 60;
 const SNAP_POINTS_RIGHT: number = 60;
 
-const UnderlayLeft = ({ onDelete, id }: { onDelete: (id: string) => Promise<void>, id: string }) => {
+const UnderlayLeft = ({
+  onDelete,
+  id,
+}: {
+  onDelete: (id: string) => Promise<void>;
+  id: string;
+}) => {
   return (
     <View style={[styles.row, styles.underlayLeft]}>
       <Pressable
@@ -32,7 +36,7 @@ const UnderlayRight = ({ id }: { id: string }) => {
     <View style={[styles.row, styles.underlayRight]}>
       <Link
         href={{
-          pathname: "/(tabs)/routine/edit-exercise",
+          pathname: "/routine/edit-exercise",
           params: { exerciseId: id },
         }}
         asChild
@@ -48,13 +52,21 @@ const UnderlayRight = ({ id }: { id: string }) => {
   );
 };
 
-export default function SwipeItem({ props, onDelete }: { props: RenderItemParams<dataProps>, onDelete: (id: string) => Promise<void> }) {
+export default function SwipeItem({
+  props,
+  onDelete,
+}: {
+  props: RenderItemParams<dataProps>;
+  onDelete: (id: string) => Promise<void>;
+}) {
   const { item, drag, isActive } = props;
 
   return (
     <SwipeableItem
       item={item}
-      renderUnderlayLeft={() => <UnderlayLeft onDelete={onDelete} id={item.id} />}
+      renderUnderlayLeft={() => (
+        <UnderlayLeft onDelete={onDelete} id={item.id} />
+      )}
       renderUnderlayRight={() => <UnderlayRight id={item.id} />}
       snapPointsLeft={[SNAP_POINTS_LEFT]}
       snapPointsRight={[SNAP_POINTS_RIGHT]}
@@ -71,7 +83,7 @@ export default function SwipeItem({ props, onDelete }: { props: RenderItemParams
       />
     </SwipeableItem>
   );
-};
+}
 
 const styles = StyleSheet.create({
   row: {
@@ -80,7 +92,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 15,
-    margin: 0
+    margin: 0,
   },
   underlayLeft: {
     flex: 1,
