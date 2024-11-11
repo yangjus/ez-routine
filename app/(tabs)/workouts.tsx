@@ -6,6 +6,7 @@ import {
   View,
   Pressable,
 } from "react-native";
+import * as SQLite from 'expo-sqlite';
 import { StatusBar } from "expo-status-bar";
 import { FlatList } from "react-native-gesture-handler";
 import { Link } from "expo-router";
