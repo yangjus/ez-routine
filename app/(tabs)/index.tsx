@@ -100,7 +100,7 @@ export default function Index() {
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.header}>EZ Routine</Text>
-        <Text>"Results happen over time, not overnight"</Text>
+        <Text style={styles.subheader}>"Results happen over time, not overnight"</Text>
       </View>
       <View style={styles.mainContainer}>
         <FlatList
@@ -134,6 +134,9 @@ const styles = StyleSheet.create({
   header: {
     fontWeight: "bold",
     fontSize: 36,
+  },
+  subheader: {
+    fontStyle: "italic",
   },
   mainContainer: {
     flex: 1,

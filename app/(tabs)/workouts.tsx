@@ -6,10 +6,10 @@ import {
   View,
   Pressable,
 } from "react-native";
-import * as SQLite from 'expo-sqlite';
 import { StatusBar } from "expo-status-bar";
 import { FlatList } from "react-native-gesture-handler";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import ThemedButton from "@/components/ThemedButton";
 
 const daysOfWeek = [
   "Monday",
@@ -38,6 +38,10 @@ export default function Workouts() {
     );
   };
 
+  const createWorkout = () => {
+    router.push('/workout/add-workout');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -50,6 +54,9 @@ export default function Workouts() {
           contentContainerStyle={{ gap: 16 }}
         />
       </View>
+      <View style={styles.footerContainer}>
+        <ThemedButton content={"Create New Workout"} onPress={createWorkout}/>
+      </View>
       <StatusBar style={Platform.OS === "ios" ? "dark" : "auto"} />
     </SafeAreaView>
   );
@@ -58,14 +65,14 @@ export default function Workouts() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 10,
+    gap: 20,
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 30,
   },
   headerContainer: {
     alignItems: "center",
-    marginVertical: 20,
+    marginTop: 20,
   },
   header: {
     fontWeight: "bold",
@@ -74,6 +81,9 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     width: "100%",
+  },
+  footerContainer: {
+    marginBottom: 20,
   },
 });
 
