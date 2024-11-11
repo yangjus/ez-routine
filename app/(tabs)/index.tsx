@@ -6,56 +6,52 @@ import {
   View,
   Pressable,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { Link } from "expo-router";
 import { FlatList } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import { useSQLiteContext } from "expo-sqlite";
-import Animated, { SharedValue, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
+import AccordionItem from "@/components/AccordionItem";
+import { useSharedValue } from "react-native-reanimated";
 
-function AccordionItem({
-  isExpanded,
-  children,
-  viewKey,
-  duration = 500,
-}: { isExpanded: SharedValue<boolean>, children: any, viewKey: string, duration?: number }) {
-  const height = useSharedValue(0);
+interface Day {
+  id: number;
+  day: string;
+};
 
-  const derivedHeight = useDerivedValue(() =>
-    withTiming(height.value * Number(isExpanded.value), {
-      duration,
-    })
-  );
-  const bodyStyle = useAnimatedStyle(() => ({
-    height: derivedHeight.value,
-  }));
-
-  return (
-    <Animated.View
-      key={`accordionItem_${viewKey}`}
-      style={[accordionStyles.animatedView, bodyStyle]}>
-      <View
-        onLayout={(e) => {
-          height.value = e.nativeEvent.layout.height;
-        }}
-        style={accordionStyles.wrapper}>
-        {children}
-      </View>
-    </Animated.View>
-  );
+interface Workout {
+  id: number;
+  day_id: number;
+  name: string;
 }
 
 const DayItem = ({ item }: { item: Day }) => {
+  const db = useSQLiteContext();
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      try {
+        const result = await db.getAllAsync<Workout>(`
+          SELECT w.id, w.name
+          FROM workouts w
+          JOIN days d ON d.id = w.day_id
+          WHERE d.id = ?
+          ORDER BY w.created_at DESC
+        `, [item.id]);
+        setWorkouts(result);
+      } catch (error) {
+        console.error("Error fetching workouts: ", error);
+      }
+    };
+    fetchWorkouts();
+  }, [item.id]);
+
   const open = useSharedValue(false);
   const onPress = () => {
     open.value = !open.value;
   };
-
-  const temp: string[] = [
-    'Workout 1',
-    'A very long workout name that no one knows about',
-  ];
 
   return (
     <View style={itemStyles.mainContainer}>
@@ -71,22 +67,22 @@ const DayItem = ({ item }: { item: Day }) => {
       </Pressable>
       {/* </Link> */}
       <AccordionItem isExpanded={open} viewKey="Accordion">
-        {temp.map((workout: string, idx: number) =>
-          <TouchableOpacity style={itemStyles.workoutContainer} key={`${item.id}-${idx}`}>
-            <Text style={itemStyles.workoutText}>{workout}</Text>
-          </TouchableOpacity>
-        )}
+        {workouts ? 
+          workouts.length > 0 ? 
+            workouts.map((workout: Workout) =>
+            <TouchableOpacity style={itemStyles.workoutContainer} key={`${workout.id}`}>
+              <Text style={itemStyles.workoutText}>{workout.name}</Text>
+            </TouchableOpacity>)
+            : <View style={itemStyles.workoutContainer}>
+              <Text style={itemStyles.noWorkoutText}>Add workouts to this day in the workouts tab.</Text>
+            </View>
+          : <ActivityIndicator />}
       </AccordionItem>
     </View>
   );
 };
 
 const renderItem = ({ item }: { item: Day }) => <DayItem item={item} />;
-
-interface Day {
-  id: number;
-  day: string;
-};
 
 export default function Index() {
   const db = useSQLiteContext();
@@ -159,7 +155,9 @@ const itemStyles = StyleSheet.create({
   workoutContainer: {
     backgroundColor: "#fff",
     alignItems: "center",
-    padding: 12,
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     borderTopWidth: 1,
@@ -172,18 +170,12 @@ const itemStyles = StyleSheet.create({
   },
   workoutText: {
     fontSize: 16,
+    textAlign: "center",
+  },
+  noWorkoutText: {
+    fontSize: 16,
+    color: 'grey',
+    fontStyle: 'italic',
+    textAlign: "center",
   }
-});
-
-const accordionStyles = StyleSheet.create({
-  animatedView: {
-    width: '100%',
-    overflow: 'hidden',
-  },
-  wrapper: {
-    width: '100%',
-    position: 'absolute',
-    display: 'flex',
-    alignItems: 'center',
-  },
 });
