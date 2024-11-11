@@ -1,6 +1,7 @@
 {
   "name": "ez-routine",
   "main": "expo-router/entry",
+  "type": "module",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
@@ -51,6 +52,5 @@
     "react-test-renderer": "18.2.0",
     "typescript": "~5.3.3"
   },
-  "type": "module",
   "private": true
 }
