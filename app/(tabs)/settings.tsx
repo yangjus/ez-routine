@@ -8,8 +8,11 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
+import { useSQLiteContext } from "expo-sqlite";
 
 export default function Settings() {
+  const db = useSQLiteContext();
+
   const confirmationDialog = () =>
     Alert.alert(
       "Clear All Data",
@@ -20,9 +23,25 @@ export default function Settings() {
       ],
     );
 
-  const clearAllData = () => {
-    // remove all local storage, reset to defaults
-    console.log("Removed all data.");
+  const clearAllData = async () => {
+    try {
+      await db.execAsync(`
+        BEGIN TRANSACTION;
+        
+        DELETE FROM sets;
+        DELETE FROM exercises;
+        DELETE FROM workouts;
+        
+        DELETE FROM sqlite_sequence WHERE name IN ('sets', 'exercises', 'workouts');
+        
+        COMMIT;
+        
+        VACUUM;
+      `);
+      alert('Successfully removed all data.');
+    } catch (e) {
+      alert(`Error: ${e}`);
+    }
   };
 
   return (

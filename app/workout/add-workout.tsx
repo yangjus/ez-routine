@@ -14,20 +14,88 @@ import DraggableFlatList, {
   ScaleDecorator,
   RenderItemParams,
 } from "react-native-draggable-flatlist";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Link,
 } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
+import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
+
+interface Exercise {
+  name: string;
+  exercise_order: number;
+}
+
+interface Workout {
+  day_id: number;
+  name: string;
+  duration?: number;
+  notes?: string;
+  exercises: Exercise[];
+}
+
+export const addWorkoutWithExercises = async (db: SQLiteDatabase, w: Workout) => {
+  try {
+    const new_workout = await db.runAsync(`
+        INSERT INTO workouts (day_id, name, duration, notes, created_at)
+        VALUES (?, ?, ?, ?, datetime('now'))
+      `, [w.day_id, w.name, w.duration ?? null, w.notes ?? null]);
+    const workout_id = new_workout.lastInsertRowId;
+    console.log(workout_id);
+    // const statement = await db.prepareAsync(`
+    //   INSERT INTO exercises (workout_id, name, exercise_order)
+    //   VALUES ($workout_id, $name, $exercise_order)
+    // `);
+    const placeholders = w.exercises.map((_, index) =>
+      `($workout_id_${index}, $name_${index}, $exercise_order_${index})`
+    ).join(', ');
+    const query = `
+        INSERT INTO exercises (workout_id, name, exercise_order)
+        VALUES ${placeholders}
+      `;
+    const params = w.exercises.reduce((acc, e, index) => ({
+      ...acc,
+      [`$workout_id_${index}`]: workout_id,
+      [`$name_${index}`]: e.name,
+      [`$exercise_order_${index}`]: e.exercise_order,
+    }), {});
+    const result = await db.runAsync(query, params);
+    console.log(result);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'An unknown error occured'
+    };
+  }
+};
+
+const newWorkout: Workout = {
+  day_id: 1, // The ID of the day this workout belongs to
+  name: 'Pull Day',
+  exercises: [
+    { name: 'Squats', exercise_order: 1 },
+    { name: 'Push-ups', exercise_order: 2 },
+    { name: 'Deadlifts', exercise_order: 3 },
+  ],
+};
 
 export default function AddWorkout() {
+  const db = useSQLiteContext();
   const [data, setData] = useState<dataProps[]>([]);
   const [name, onChangeName] = useState<string>("");
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
-  const onPress = async () => {
-    alert("Workout created successfully.");
+  const addWorkout = async () => {
+    const result = await addWorkoutWithExercises(db, newWorkout);
+    if (result.success) {
+      alert('Workout and exercises added successfully');
+      // You might want to update your UI or state here
+    } else {
+      alert(`Failed to add workout: ${result.error}`);
+      // Handle the error, maybe show an alert to the user
+    }
   };
 
   const onDelete = async () => {
@@ -53,6 +121,7 @@ export default function AddWorkout() {
             onBlur={() => setIsFocused(false)}
             onFocus={() => setIsFocused(true)}
             placeholder="Workout name..."
+
           />
         </View>
         <View style={styles.addButton}>
@@ -71,18 +140,19 @@ export default function AddWorkout() {
         </View>
       </View>
       <View style={styles.mainContainer}>
-        <DraggableFlatList
-          data={data ?? []}
-          renderItem={renderItem}
-          onDragEnd={({ data }) => setData(data)}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          activationDistance={20}
-          ListEmptyComponent={<EmptyContainer />}
-        />
+        {data && data.length > 0 ?
+          <DraggableFlatList
+            data={data ?? []}
+            renderItem={renderItem}
+            onDragEnd={({ data }) => setData(data)}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            activationDistance={20}
+          /> : <EmptyContainer />
+        }
       </View>
       <View style={styles.footerContainer}>
-        <ThemedButton content={"Create Workout"} onPress={onPress} />
+        <ThemedButton content={"Create Workout"} onPress={addWorkout} />
       </View>
       <StatusBar style={Platform.OS === "ios" ? "dark" : "auto"} />
     </SafeAreaView>
