@@ -1,10 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSQLiteContext } from "expo-sqlite";
 
+export interface Exercise {
+  name: string;
+  exercise_order: number;
+}
+
 export interface Workout {
-  id: number;
+  id?: number;
   day_id: number;
   name: string;
+  duration?: number;
+  notes?: string;
+  exercises: Exercise[];
 }
 
 const useWorkouts = (dayId: number) => {

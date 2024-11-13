@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
-import { useSQLiteContext } from "expo-sqlite";
 import useClearAll from "@/hooks/useClearAll";
 
 export default function Settings() {

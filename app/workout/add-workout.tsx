@@ -21,6 +21,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
 import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
+import useAddWorkout from "@/hooks/useAddWorkout";
 
 interface Exercise {
   name: string;
@@ -28,6 +29,7 @@ interface Exercise {
 }
 
 interface Workout {
+  id?: number;
   day_id: number;
   name: string;
   duration?: number;
@@ -86,16 +88,10 @@ export default function AddWorkout() {
   const [data, setData] = useState<dataProps[]>([]);
   const [name, onChangeName] = useState<string>("");
   const [isFocused, setIsFocused] = useState<boolean>(false);
+  const addWorkoutMutation = useAddWorkout();
 
   const addWorkout = async () => {
-    const result = await addWorkoutWithExercises(db, newWorkout);
-    if (result.success) {
-      alert('Workout and exercises added successfully');
-      // You might want to update your UI or state here
-    } else {
-      alert(`Failed to add workout: ${result.error}`);
-      // Handle the error, maybe show an alert to the user
-    }
+    addWorkoutMutation.mutateAsync(newWorkout);
   };
 
   const onDelete = async () => {
