@@ -14,39 +14,15 @@ import { useEffect, useState } from "react";
 import { useSQLiteContext } from "expo-sqlite";
 import AccordionItem from "@/components/AccordionItem";
 import { useSharedValue } from "react-native-reanimated";
+import useWorkouts, { Workout } from "@/hooks/useWorkouts";
 
 interface Day {
   id: number;
   day: string;
 };
 
-interface Workout {
-  id: number;
-  day_id: number;
-  name: string;
-}
-
 const DayItem = ({ item }: { item: Day }) => {
-  const db = useSQLiteContext();
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
-
-  useEffect(() => {
-    const fetchWorkouts = async () => {
-      try {
-        const result = await db.getAllAsync<Workout>(`
-          SELECT w.id, w.name
-          FROM workouts w
-          JOIN days d ON d.id = w.day_id
-          WHERE d.id = ?
-          ORDER BY w.created_at DESC
-        `, [item.id]);
-        setWorkouts(result);
-      } catch (error) {
-        console.error("Error fetching workouts: ", error);
-      }
-    };
-    fetchWorkouts();
-  }, [item.id]);
+  const { data: workouts } = useWorkouts(item.id);
 
   const open = useSharedValue(false);
   const onPress = () => {
@@ -67,12 +43,12 @@ const DayItem = ({ item }: { item: Day }) => {
       </Pressable>
       {/* </Link> */}
       <AccordionItem isExpanded={open} viewKey="Accordion">
-        {workouts ? 
-          workouts.length > 0 ? 
+        {workouts ?
+          workouts.length > 0 ?
             workouts.map((workout: Workout) =>
-            <TouchableOpacity style={itemStyles.workoutContainer} key={`${workout.id}`}>
-              <Text style={itemStyles.workoutText}>{workout.name}</Text>
-            </TouchableOpacity>)
+              <TouchableOpacity style={itemStyles.workoutContainer} key={`${workout.id}`}>
+                <Text style={itemStyles.workoutText}>{workout.name}</Text>
+              </TouchableOpacity>)
             : <View style={itemStyles.workoutContainer}>
               <Text style={itemStyles.noWorkoutText}>Add workouts to this day in the workouts tab.</Text>
             </View>
