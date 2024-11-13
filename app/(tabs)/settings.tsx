@@ -9,9 +9,10 @@ import {
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
 import { useSQLiteContext } from "expo-sqlite";
+import useClearAll from "@/hooks/useClearAll";
 
 export default function Settings() {
-  const db = useSQLiteContext();
+  const clearAllMutation = useClearAll();
 
   const confirmationDialog = () =>
     Alert.alert(
@@ -24,24 +25,7 @@ export default function Settings() {
     );
 
   const clearAllData = async () => {
-    try {
-      await db.execAsync(`
-        BEGIN TRANSACTION;
-        
-        DELETE FROM sets;
-        DELETE FROM exercises;
-        DELETE FROM workouts;
-        
-        DELETE FROM sqlite_sequence WHERE name IN ('sets', 'exercises', 'workouts');
-        
-        COMMIT;
-        
-        VACUUM;
-      `);
-      alert('Successfully removed all data.');
-    } catch (e) {
-      alert(`Error: ${e}`);
-    }
+    clearAllMutation.mutateAsync();
   };
 
   return (
