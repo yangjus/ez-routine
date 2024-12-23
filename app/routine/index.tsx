@@ -6,7 +6,7 @@ import {
   Pressable,
   Platform,
 } from "react-native";
-import { data_placeholder, dataProps } from "@/data/placeholders";
+import { dataProps } from "@/data/placeholders";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import SwipeItem from "@/components/SwipeableItem";
 import DraggableFlatList, {
@@ -23,25 +23,31 @@ import {
 } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
-import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import { useExercises } from "@/hooks/useWorkouts";
 
 export default function Routine() {
   const navigation = useNavigation();
   const props: UnknownOutputParams = useLocalSearchParams();
-  // TODO: hold routines within id
-  const { dayOfWeek, routineId } = props; // used to identify id
+  const { dayOfWeek, workoutId } = props;
   const [data, setData] = useState<dataProps[]>();
   const segments = useSegments();
-  const { getItem, setItem } = useAsyncStorage("@data");
+  const { data: exercises } = useExercises(parseInt(workoutId as string));
+  console.log(workoutId);
 
-  const readItemFromStorage = async () => {
-    const item = await getItem();
-    setData(item != null ? JSON.parse(item) : data_placeholder);
+  const readItemFromStorage = () => {
+    console.log('real exercises: ', exercises);
+    const item = exercises?.sort((a, b) => a.exercise_order - b.exercise_order)
+      .map(exercise => ({
+        id: (exercise.id ?? 1).toString(),
+        title: exercise.name,
+        repRange: [exercise.rep_min, exercise.rep_max],
+      }));
+    setData(item);
   };
 
   const deleteItemFromStorage = async (id: string) => {
     const newItem = data?.filter((item) => item.id !== id);
-    await setItem(JSON.stringify(newItem));
+    // await setItem(JSON.stringify(newItem));
     setData(newItem);
   };
 

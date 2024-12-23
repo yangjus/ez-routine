@@ -1,12 +1,13 @@
 import SwipeableItem, {
   useSwipeableItemParams,
 } from "react-native-swipeable-item";
-import { dataProps } from "@/data/placeholders";
+import { contentProps, dataProps } from "@/data/placeholders";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Item from "./Item";
 import { View, StyleSheet, Pressable } from "react-native";
 import { RenderItemParams } from "react-native-draggable-flatlist";
 import { Link } from "expo-router";
+import { useSets } from "@/hooks/useWorkouts";
 
 const SNAP_POINTS_LEFT: number = 60;
 const SNAP_POINTS_RIGHT: number = 60;
@@ -60,6 +61,7 @@ export default function SwipeItem({
   onDelete: (id: string) => Promise<void>;
 }) {
   const { item, drag, isActive } = props;
+  const { data: sets } = useSets(parseInt(item.id as string));
 
   return (
     <SwipeableItem
@@ -76,8 +78,8 @@ export default function SwipeItem({
         title={item.title}
         minRep={item.repRange[0]}
         maxRep={item.repRange[1]}
-        sets={item.sets}
-        content={item.content}
+        sets={sets?.length ?? 0}
+        content={sets as contentProps[]}
         rearrange={drag}
         disableRearrange={isActive}
       />

@@ -15,14 +15,17 @@ import { useSQLiteContext } from "expo-sqlite";
 import AccordionItem from "@/components/AccordionItem";
 import { useSharedValue } from "react-native-reanimated";
 import useWorkouts, { Workout } from "@/hooks/useWorkouts";
+import { Link } from "expo-router";
 
 interface Day {
   id: number;
   day: string;
 };
 
+
 const DayItem = ({ item }: { item: Day }) => {
   const { data: workouts } = useWorkouts(item.id);
+  console.log("workouts: ", workouts);
 
   const open = useSharedValue(false);
   const onPress = () => {
@@ -31,24 +34,25 @@ const DayItem = ({ item }: { item: Day }) => {
 
   return (
     <View style={itemStyles.mainContainer}>
-      {/* <Link
-        href={{
-          pathname: "/routine",
-          params: { dayOfWeek: item.day },
-        }}
-        asChild
-      > */}
       <Pressable style={itemStyles.dayContainer} onPress={onPress}>
         <Text style={itemStyles.dayText}>{item.day}</Text>
       </Pressable>
-      {/* </Link> */}
       <AccordionItem isExpanded={open} viewKey="Accordion">
         {workouts ?
           workouts.length > 0 ?
             workouts.map((workout: Workout) =>
-              <TouchableOpacity style={itemStyles.workoutContainer} key={`${workout.id}`}>
-                <Text style={itemStyles.workoutText}>{workout.name}</Text>
-              </TouchableOpacity>)
+              <Link
+                href={{
+                  pathname: "/routine",
+                  params: { dayOfWeek: item.day, workoutId: workout.id },
+                }}
+                key={`${workout.id}`}
+                asChild
+              >
+                <TouchableOpacity style={itemStyles.workoutContainer}>
+                  <Text style={itemStyles.workoutText}>{workout.name}</Text>
+                </TouchableOpacity>
+              </Link>)
             : <View style={itemStyles.workoutContainer}>
               <Text style={itemStyles.noWorkoutText}>Add workouts to this day in the workouts tab.</Text>
             </View>

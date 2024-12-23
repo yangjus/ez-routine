@@ -12,8 +12,9 @@ const useClearAll = () => {
         DELETE FROM sets;
         DELETE FROM exercises;
         DELETE FROM workouts;
+        DELETE FROM workout_days;
         DELETE FROM sqlite_sequence 
-          WHERE name IN ('sets', 'exercises', 'workouts');
+          WHERE name IN ('sets', 'exercises', 'workouts', 'workout_days');
         COMMIT;
         VACUUM;
       `);

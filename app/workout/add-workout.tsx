@@ -17,69 +17,74 @@ import DraggableFlatList, {
 import React, { useState } from "react";
 import {
   Link,
+  useNavigation,
 } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
-import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
+import { useSQLiteContext } from "expo-sqlite";
 import useAddWorkout from "@/hooks/useAddWorkout";
+import { Workout } from "@/hooks/useWorkouts";
+import { FlatList } from "react-native-gesture-handler";
 
-interface Exercise {
-  name: string;
-  exercise_order: number;
-}
+const selectDays = [
+  { id: 1, label: "Mon" },
+  { id: 2, label: "Tues" },
+  { id: 3, label: "Wed" },
+  { id: 4, label: "Thurs" },
+  { id: 5, label: "Fri" },
+  { id: 6, label: "Sat" },
+  { id: 7, label: "Sun" },
+];
 
-interface Workout {
-  id?: number;
-  day_id: number;
-  name: string;
-  duration?: number;
-  notes?: string;
-  exercises: Exercise[];
-}
+type InputWorkout = Omit<Workout, 'id'>;
 
-export const addWorkoutWithExercises = async (db: SQLiteDatabase, w: Workout) => {
-  try {
-    const new_workout = await db.runAsync(`
-        INSERT INTO workouts (day_id, name, duration, notes, created_at)
-        VALUES (?, ?, ?, ?, datetime('now'))
-      `, [w.day_id, w.name, w.duration ?? null, w.notes ?? null]);
-    const workout_id = new_workout.lastInsertRowId;
-    console.log(workout_id);
-    // const statement = await db.prepareAsync(`
-    //   INSERT INTO exercises (workout_id, name, exercise_order)
-    //   VALUES ($workout_id, $name, $exercise_order)
-    // `);
-    const placeholders = w.exercises.map((_, index) =>
-      `($workout_id_${index}, $name_${index}, $exercise_order_${index})`
-    ).join(', ');
-    const query = `
-        INSERT INTO exercises (workout_id, name, exercise_order)
-        VALUES ${placeholders}
-      `;
-    const params = w.exercises.reduce((acc, e, index) => ({
-      ...acc,
-      [`$workout_id_${index}`]: workout_id,
-      [`$name_${index}`]: e.name,
-      [`$exercise_order_${index}`]: e.exercise_order,
-    }), {});
-    const result = await db.runAsync(query, params);
-    console.log(result);
-    return { success: true };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'An unknown error occured'
-    };
-  }
-};
-
-const newWorkout: Workout = {
-  day_id: 1, // The ID of the day this workout belongs to
+const newWorkout: InputWorkout = {
   name: 'Pull Day',
   exercises: [
-    { name: 'Squats', exercise_order: 1 },
-    { name: 'Push-ups', exercise_order: 2 },
-    { name: 'Deadlifts', exercise_order: 3 },
+    {
+      name: 'Lat Pulldown',
+      exercise_order: 1,
+      rep_min: 8,
+      rep_max: 12,
+      sets: [
+        { set_order: 1, reps: 10, weight: 80 },
+        { set_order: 2, reps: 12, weight: 80 },
+        { set_order: 3, reps: 12, weight: 80 },
+      ],
+    },
+    {
+      name: 'Cable Row',
+      exercise_order: 2,
+      rep_min: 10,
+      rep_max: 15,
+      sets: [
+        { set_order: 1, reps: 15, weight: 60 },
+        { set_order: 2, reps: 10, weight: 70 },
+        { set_order: 3, reps: 10, weight: 80 },
+      ],
+    },
+    {
+      name: 'Rear Delt Flys',
+      exercise_order: 3,
+      rep_min: 10,
+      rep_max: 15,
+      sets: [
+        { set_order: 1, reps: 13, weight: 80 },
+        { set_order: 2, reps: 13, weight: 80 },
+        { set_order: 3, reps: 12, weight: 100 },
+      ],
+    },
+    {
+      name: 'Upright Row',
+      exercise_order: 4,
+      rep_min: 8,
+      rep_max: 12,
+      sets: [
+        { set_order: 1, reps: 8, weight: 50 },
+        { set_order: 2, reps: 10, weight: 50 },
+        { set_order: 3, reps: 10, weight: 50 },
+      ],
+    },
   ],
 };
 
@@ -89,9 +94,12 @@ export default function AddWorkout() {
   const [name, onChangeName] = useState<string>("");
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const addWorkoutMutation = useAddWorkout();
+  const navigation = useNavigation();
+  const [selectedDays, setSelectedDays] = useState<number[]>([]);
 
   const addWorkout = async () => {
-    addWorkoutMutation.mutateAsync(newWorkout);
+    addWorkoutMutation.mutateAsync({ w: newWorkout, days: [1, 2] });
+    navigation.goBack();
   };
 
   const onDelete = async () => {
@@ -117,7 +125,6 @@ export default function AddWorkout() {
             onBlur={() => setIsFocused(false)}
             onFocus={() => setIsFocused(true)}
             placeholder="Workout name..."
-
           />
         </View>
         <View style={styles.addButton}>
@@ -135,6 +142,26 @@ export default function AddWorkout() {
           </Link>
         </View>
       </View>
+      <Text>Assign Days</Text>
+      <FlatList
+        data={selectDays}
+        renderItem={({ item }) =>
+          <Pressable
+            style={[styles.button, selectedDays.includes(item.id) && styles.selectedButton]}
+            onPress={() => setSelectedDays((prevDays) =>
+              prevDays.includes(item.id)
+                ? prevDays.filter(id => id !== item.id)
+                : [...prevDays, item.id]
+            )}
+          >
+            <Text style={[styles.buttonText, selectedDays.includes(item.id) && styles.selectedButtonText]}>{item.label}</Text>
+          </Pressable>
+        }
+        keyExtractor={(item) => item.id.toString()}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ height: 40, gap: 10 }}
+      />
       <View style={styles.mainContainer}>
         {data && data.length > 0 ?
           <DraggableFlatList
@@ -166,7 +193,7 @@ const EmptyContainer = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 20,
+    gap: 10,
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 30,
@@ -205,5 +232,27 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     marginVertical: 4,
+  },
+  button: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: 'black',
+  },
+  buttonText: {
+    color: '#fff'
+  },
+  selectedButton: {
+    backgroundColor: 'lightgray',
+  },
+  selectedButtonText: {
+    color: 'black',
+  },
+  warningButton: {
+    backgroundColor: "#DC143C",
+  },
+  warningButtonText: {
+    color: "white",
   },
 });

@@ -9,7 +9,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView>
-        <SQLiteProvider databaseName="data.db" assetSource={{ assetId: require('@/assets/data.db') }}>
+        <SQLiteProvider databaseName="data2.db" assetSource={{ assetId: require('@/assets/data2.db') }}>
           <App />
         </SQLiteProvider>
       </GestureHandlerRootView>

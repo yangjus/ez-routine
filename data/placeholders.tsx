@@ -8,8 +8,6 @@ export type dataProps = {
   id: string
   title: string
   repRange: number[]
-  sets: number
-  content: contentProps[]
 }
 
 export const data_placeholder: dataProps[] = [
