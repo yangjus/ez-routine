@@ -31,14 +31,20 @@ const UnderlayLeft = ({
   );
 };
 
-const UnderlayRight = ({ id }: { id: string }) => {
+const UnderlayRight = ({
+  id,
+  workoutId,
+}: {
+  id: string;
+  workoutId: number;
+}) => {
   const { close } = useSwipeableItemParams();
   return (
     <View style={[styles.row, styles.underlayRight]}>
       <Link
         href={{
-          pathname: "/routine/edit-exercise",
-          params: { exerciseId: id },
+          pathname: "/workouts/[workoutId]/exercises/[exerciseId]/edit",
+          params: { exerciseId: id, workoutId },
         }}
         asChild
       >
@@ -56,9 +62,11 @@ const UnderlayRight = ({ id }: { id: string }) => {
 export default function SwipeItem({
   props,
   onDelete,
+  workoutId,
 }: {
   props: RenderItemParams<dataProps>;
   onDelete: (id: string) => Promise<void>;
+  workoutId: number;
 }) {
   const { item, drag, isActive } = props;
   const { data: sets } = useSets(parseInt(item.id as string));
@@ -69,7 +77,9 @@ export default function SwipeItem({
       renderUnderlayLeft={() => (
         <UnderlayLeft onDelete={onDelete} id={item.id} />
       )}
-      renderUnderlayRight={() => <UnderlayRight id={item.id} />}
+      renderUnderlayRight={() => (
+        <UnderlayRight id={item.id} workoutId={workoutId} />
+      )}
       snapPointsLeft={[SNAP_POINTS_LEFT]}
       snapPointsRight={[SNAP_POINTS_RIGHT]}
       key={item.id}

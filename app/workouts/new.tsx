@@ -7,23 +7,12 @@ import {
   Platform,
   TextInput,
 } from "react-native";
-import { dataProps } from "@/data/placeholders";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import SwipeItem from "@/components/SwipeableItem";
-import DraggableFlatList, {
-  ScaleDecorator,
-  RenderItemParams,
-} from "react-native-draggable-flatlist";
 import React, { useState } from "react";
-import {
-  Link,
-  useNavigation,
-} from "expo-router";
+import { useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
-import { useSQLiteContext } from "expo-sqlite";
 import useAddWorkout from "@/hooks/useAddWorkout";
-import { Workout } from "@/hooks/useWorkouts";
+import { NewWorkout } from "@/db/types";
 import { FlatList } from "react-native-gesture-handler";
 
 const selectDays = [
@@ -36,9 +25,7 @@ const selectDays = [
   { id: 7, label: "Sun" },
 ];
 
-type InputWorkout = Omit<Workout, 'id'>;
-
-const newWorkout: InputWorkout = {
+const newWorkout: NewWorkout = {
   name: 'Pull Day',
   exercises: [
     {
@@ -89,8 +76,6 @@ const newWorkout: InputWorkout = {
 };
 
 export default function AddWorkout() {
-  const db = useSQLiteContext();
-  const [data, setData] = useState<dataProps[]>([]);
   const [name, onChangeName] = useState<string>("");
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const addWorkoutMutation = useAddWorkout();
@@ -98,20 +83,26 @@ export default function AddWorkout() {
   const [selectedDays, setSelectedDays] = useState<number[]>([]);
 
   const addWorkout = async () => {
-    addWorkoutMutation.mutateAsync({ w: newWorkout, days: [1, 2] });
+    const trimmedName = name.trim();
+
+    if (!trimmedName) {
+      alert("Add workout name");
+      return;
+    }
+
+    if (selectedDays.length === 0) {
+      alert("Assign at least one day");
+      return;
+    }
+
+    await addWorkoutMutation.mutateAsync({
+      w: {
+        ...newWorkout,
+        name: trimmedName,
+      },
+      days: selectedDays,
+    });
     navigation.goBack();
-  };
-
-  const onDelete = async () => {
-    console.log("delete");
-  }
-
-  const renderItem = (params: RenderItemParams<dataProps>) => {
-    return (
-      <ScaleDecorator>
-        <SwipeItem props={params} onDelete={onDelete} />
-      </ScaleDecorator>
-    );
   };
 
   return (
@@ -126,20 +117,6 @@ export default function AddWorkout() {
             onFocus={() => setIsFocused(true)}
             placeholder="Workout name..."
           />
-        </View>
-        <View style={styles.addButton}>
-          <Link href="/routine/add-exercise" asChild>
-            <Pressable
-              hitSlop={20}
-              children={({ pressed }) => (
-                <MaterialIcons
-                  name="add-circle"
-                  size={30}
-                  color={pressed ? "gray" : "black"}
-                />
-              )}
-            />
-          </Link>
         </View>
       </View>
       <Text>Assign Days</Text>
@@ -163,16 +140,7 @@ export default function AddWorkout() {
         contentContainerStyle={{ height: 40, gap: 10 }}
       />
       <View style={styles.mainContainer}>
-        {data && data.length > 0 ?
-          <DraggableFlatList
-            data={data ?? []}
-            renderItem={renderItem}
-            onDragEnd={({ data }) => setData(data)}
-            keyExtractor={(item) => item.id}
-            showsVerticalScrollIndicator={false}
-            activationDistance={20}
-          /> : <EmptyContainer />
-        }
+        <EmptyContainer />
       </View>
       <View style={styles.footerContainer}>
         <ThemedButton content={"Create Workout"} onPress={addWorkout} />
@@ -185,7 +153,7 @@ export default function AddWorkout() {
 const EmptyContainer = () => {
   return (
     <View>
-      <Text>No exercises added. Press + icon on top right to add exercises.</Text>
+      <Text>Default starter exercises will be added to this workout.</Text>
     </View>
   )
 };
@@ -222,9 +190,6 @@ const styles = StyleSheet.create({
   header: {
     fontWeight: "bold",
     fontSize: 30,
-  },
-  addButton: {
-    justifyContent: "center",
   },
   mainContainer: {
     flex: 1,

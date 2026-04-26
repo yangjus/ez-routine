@@ -10,36 +10,30 @@ import { StatusBar } from "expo-status-bar";
 import { FlatList } from "react-native-gesture-handler";
 import { Link, router } from "expo-router";
 import ThemedButton from "@/components/ThemedButton";
-
-const daysOfWeek = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
+import { useAllWorkouts, Workout } from "@/hooks/useWorkouts";
 
 export default function Workouts() {
-  const renderItem = ({ item }: { item: string }) => {
+  const { data: workouts = [] } = useAllWorkouts();
+
+  const renderItem = ({ item }: { item: Workout }) => {
     return (
       <Link
         href={{
-          pathname: "/routine",
-          params: { dayOfWeek: item },
+          pathname: "/workouts/[workoutId]",
+          params: { workoutId: item.id },
         }}
+        key={`${item.id}`}
         asChild
       >
         <Pressable style={itemStyles.container}>
-          <Text style={itemStyles.text}>{item}</Text>
+          <Text style={itemStyles.text}>{item.name}</Text>
         </Pressable>
       </Link>
     );
   };
 
   const createWorkout = () => {
-    router.push('/workout/add-workout');
+    router.push("/workouts/new");
   };
 
   return (
@@ -49,13 +43,13 @@ export default function Workouts() {
       </View>
       <View style={styles.mainContainer}>
         <FlatList
-          data={daysOfWeek}
+          data={workouts}
           renderItem={renderItem}
           contentContainerStyle={{ gap: 16 }}
         />
       </View>
       <View style={styles.footerContainer}>
-        <ThemedButton content={"Create New Workout"} onPress={createWorkout}/>
+        <ThemedButton content={"Create New Workout"} onPress={createWorkout} />
       </View>
       <StatusBar style={Platform.OS === "ios" ? "dark" : "auto"} />
     </SafeAreaView>

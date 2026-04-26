@@ -1,0 +1,19 @@
+Things remaining to do (in order):
+1. Completed set feature (and reset from Finish Workout)
+2. Drag and drop between sets and update db, the sort_order
+3. Be able to edit an exercise
+4. Be able to delete an exercise
+5. Error handling or if database row does not exist, show message
+6. Refactoring changes e.g. removing legacy code, combining similar types/interfaces
+7. Improve efficiency of database reads and writes (no more for loops)
+8. Be able to add an exercise
+9. Remove old UI from workouts tab
+10. Improved UI for creating new workout (move add exercise button bottom right, replace original location with save icon)
+11. Replace placeholder data with user data for creating new workout
+12. List workouts (very similar UI as to home page, maybe change this?)
+
+
+
+Other:
+- Figure out why linting doesn't work
+- Figure out loading ES module warning issue

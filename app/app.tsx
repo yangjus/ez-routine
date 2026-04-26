@@ -9,8 +9,7 @@ export default function App() {
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="routine" options={{ headerShown: false }} />
-      <Stack.Screen name="workout" options={{ headerShown: false }} />
+      <Stack.Screen name="workouts" options={{ headerShown: false }} />
     </Stack>
   );
 }

@@ -13,42 +13,49 @@ import DraggableFlatList, {
   ScaleDecorator,
   RenderItemParams,
 } from "react-native-draggable-flatlist";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   Link,
   UnknownOutputParams,
   useLocalSearchParams,
   useNavigation,
-  useSegments,
 } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import ThemedButton from "@/components/ThemedButton";
 import { useExercises } from "@/hooks/useWorkouts";
+import {
+  useDeleteExercise,
+  useReorderExercises,
+} from "@/hooks/useExerciseMutations";
 
 export default function Routine() {
   const navigation = useNavigation();
   const props: UnknownOutputParams = useLocalSearchParams();
   const { dayOfWeek, workoutId } = props;
-  const [data, setData] = useState<dataProps[]>();
-  const segments = useSegments();
-  const { data: exercises } = useExercises(parseInt(workoutId as string));
-  console.log(workoutId);
+  const parsedWorkoutId = Number(workoutId);
+  const workoutIdParam = String(workoutId);
+  const { data: exercises } = useExercises(parsedWorkoutId);
+  const deleteExercise = useDeleteExercise(parsedWorkoutId);
+  const reorderExercises = useReorderExercises(parsedWorkoutId);
 
-  const readItemFromStorage = () => {
-    console.log('real exercises: ', exercises);
-    const item = exercises?.sort((a, b) => a.exercise_order - b.exercise_order)
+  const data: dataProps[] = useMemo(() => {
+    return [...(exercises ?? [])]
+      .sort((a, b) => a.exercise_order - b.exercise_order)
       .map(exercise => ({
-        id: (exercise.id ?? 1).toString(),
+        id: exercise.id.toString(),
         title: exercise.name,
         repRange: [exercise.rep_min, exercise.rep_max],
+        sets: 0,
+        content: [],
       }));
-    setData(item);
+  }, [exercises]);
+
+  const deleteItemFromDatabase = async (id: string) => {
+    await deleteExercise.mutateAsync(Number(id));
   };
 
-  const deleteItemFromStorage = async (id: string) => {
-    const newItem = data?.filter((item) => item.id !== id);
-    // await setItem(JSON.stringify(newItem));
-    setData(newItem);
+  const reorderItemsInDatabase = async (items: dataProps[]) => {
+    await reorderExercises.mutateAsync(items.map((item) => Number(item.id)));
   };
 
   const onPress = async () => {
@@ -57,23 +64,20 @@ export default function Routine() {
   };
 
   useEffect(() => {
-    console.log("day of week: ", dayOfWeek);
-    console.log("data rendered/changed");
-  }, [data]);
-
-  useEffect(() => {
     navigation.setOptions({
       title: `${dayOfWeek} Routine`,
       headerShown: true,
     });
-    readItemFromStorage();
-    console.log("open new tab");
-  }, [segments]);
+  }, [dayOfWeek, navigation]);
 
   const renderItem = (params: RenderItemParams<dataProps>) => {
     return (
       <ScaleDecorator>
-        <SwipeItem props={params} onDelete={deleteItemFromStorage} />
+        <SwipeItem
+          props={params}
+          onDelete={deleteItemFromDatabase}
+          workoutId={parsedWorkoutId}
+        />
       </ScaleDecorator>
     );
   };
@@ -86,7 +90,13 @@ export default function Routine() {
           <Text>Estimated Time: 65 minutes</Text>
         </View>
         <View style={styles.addButton}>
-          <Link href="/routine/add-exercise" asChild>
+          <Link
+            href={{
+              pathname: "/workouts/[workoutId]/exercises/new",
+              params: { workoutId: workoutIdParam },
+            }}
+            asChild
+          >
             <Pressable
               hitSlop={20}
               children={({ pressed }) => (
@@ -102,9 +112,9 @@ export default function Routine() {
       </View>
       <View style={styles.mainContainer}>
         <DraggableFlatList
-          data={data ?? []}
+          data={data}
           renderItem={renderItem}
-          onDragEnd={({ data }) => setData(data)}
+          onDragEnd={({ data }) => reorderItemsInDatabase(data)}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           activationDistance={20}

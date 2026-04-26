@@ -43,7 +43,7 @@ const DayItem = ({ item }: { item: Day }) => {
             workouts.map((workout: Workout) =>
               <Link
                 href={{
-                  pathname: "/routine",
+                  pathname: "/workouts/[workoutId]",
                   params: { dayOfWeek: item.day, workoutId: workout.id },
                 }}
                 key={`${workout.id}`}
